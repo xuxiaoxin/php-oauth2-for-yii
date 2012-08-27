@@ -11,32 +11,15 @@ class YiiOAuth2 extends OAuth2 {
   const TOKEN_TYPE_REFRESH_TOKEN = 'refresh';
   
   static private $instance = false;
-
-  private $db;
-  
-  public static function init($options = array(), $forceNewInstance = false)
-  {
-	  if (!YiiOAuth2::$instance or $forceNewInstance)
-	  {
-	      YiiOAuth2::$instance = new YiiOAuth2($options['dsn'], $options['username'], $options['password']);
-	  }
-  }
   
   public static function instance() {
+      if(YiiOAuth2::$instance === false){
+          YiiOAuth2::$instance = new YiiOAuth2;
+      }
       return YiiOAuth2::$instance;
   }
   
-  public static function authorize()
-  {
-      return YiiOAuth2::$instance->finishClientAuthorization(TRUE, $_POST);
-  }
-  
-  public static function accessToken()
-  {
-      return YiiOAuth2::$instance->grantAccessToken();
-  }
-  
-  public static function verify()
+  public function verify()
   {
       if(YiiOAuth2::$instance->verifyAccessToken())
           return YiiOAuth2::$instance->getVariable('user_id');
@@ -44,23 +27,10 @@ class YiiOAuth2 extends OAuth2 {
   }
   
   /**
-   * Overrides OAuth2::__construct().
-   */
-  public function __construct($dsn, $user, $pass) {
-    parent::__construct();
-
-    try {
-      $this->db = new PDO($dsn, $user, $pass);
-    } catch (PDOException $e) {
-      die('Connection failed: ' . $e->getMessage());
-    }
-  }
-
-  /**
    * Release DB connection during destruct.
    */
   function __destruct() {
-    $this->db = NULL; // Release db connection
+    
   }
 
   /**
@@ -179,6 +149,7 @@ class YiiOAuth2 extends OAuth2 {
   protected function getSupportedGrantTypes() {
     return array(
       OAUTH2_GRANT_TYPE_USER_CREDENTIALS,
+      OAUTH2_GRANT_TYPE_AUTH_CODE,
     );
   }
 
