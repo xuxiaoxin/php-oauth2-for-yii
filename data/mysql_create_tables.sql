@@ -14,7 +14,7 @@ CREATE TABLE `oauth2_clients` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO oauth2_clients (client_id, client_secret, redirect_uri, app_owner_user_id, app_title, status) VALUES
-('1234567890', '1234567890', 'http://localhost/oauth_callback', 1, 'client_app', 1);
+('1234567890', '1234567890', 'http://localhost/oauth_callback', 1, '酷动网客户端', 1);
 
 DROP TABLE IF EXISTS `oauth2_tokens`;
 CREATE TABLE `oauth2_tokens` (
