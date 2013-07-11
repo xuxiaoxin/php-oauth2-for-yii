@@ -29,8 +29,9 @@
 
 /**
  * The default duration in seconds of the access token lifetime.
+ * 24 hours
  */
-define("OAUTH2_DEFAULT_ACCESS_TOKEN_LIFETIME", 3600);
+define("OAUTH2_DEFAULT_ACCESS_TOKEN_LIFETIME", 86400);
 
 /**
  * The default duration in seconds of the authorization code lifetime.
@@ -885,6 +886,7 @@ abstract class OAuth2 {
       return $exit_invalid ? $this->errorWWWAuthenticateResponseHeader(OAUTH2_HTTP_UNAUTHORIZED, $realm, OAUTH2_ERROR_INVALID_TOKEN, 'The access token provided is invalid.', NULL, $scope) : FALSE;
 
     if(isset($token["user_id"])){
+        $this->setVariable('token', $token);
         $this->setVariable('user_id', $token["user_id"]);
     }
     // Check token expiration (I'm leaving this check separated, later we'll fill in better error messages)
@@ -1002,7 +1004,7 @@ abstract class OAuth2 {
 
     $input = filter_input_array(INPUT_POST, $filters);
     
-    
+   
 
     // Grant Type must be specified.
     if (!$input["grant_type"])
@@ -1017,6 +1019,8 @@ abstract class OAuth2 {
 
     if ($this->checkClientCredentials($client[0], $client[1]) === FALSE)
       $this->errorJsonResponse(OAUTH2_HTTP_BAD_REQUEST, OAUTH2_ERROR_INVALID_CLIENT);
+      
+
 
     if (!$this->checkRestrictedGrantType($client[0], $input["grant_type"]))
       $this->errorJsonResponse(OAUTH2_HTTP_BAD_REQUEST, OAUTH2_ERROR_UNAUTHORIZED_CLIENT);

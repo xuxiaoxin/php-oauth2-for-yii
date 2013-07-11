@@ -6,11 +6,14 @@ require_once dirname(__FILE__). DIRECTORY_SEPARATOR . 'lib/OAuth2.inc';
  */
 class YiiOAuth2 extends OAuth2 {
   
+  
   const TOKEN_TYPE_CODE = 'code';
   const TOKEN_TYPE_ACCESS_TOKEN = 'access';
   const TOKEN_TYPE_REFRESH_TOKEN = 'refresh';
   
   static private $instance = false;
+  
+  private $_identity = false;
   
   public static function instance() {
       if(YiiOAuth2::$instance === false){
@@ -19,10 +22,10 @@ class YiiOAuth2 extends OAuth2 {
       return YiiOAuth2::$instance;
   }
   
-  public function verify()
+  public function verifyToken()
   {
       if(YiiOAuth2::$instance->verifyAccessToken())
-          return YiiOAuth2::$instance->getVariable('user_id');
+          return YiiOAuth2::$instance->getVariable('token');
       return FALSE;
   }
   
@@ -97,7 +100,7 @@ class YiiOAuth2 extends OAuth2 {
       $stmt->bindParam(":client_id", $client_id, PDO::PARAM_STR);
 
       $result = $stmt->queryRow();
-
+      
       if ($client_secret === NULL)
           return $result !== FALSE;
 
@@ -149,7 +152,6 @@ class YiiOAuth2 extends OAuth2 {
   protected function getSupportedGrantTypes() {
     return array(
       OAUTH2_GRANT_TYPE_USER_CREDENTIALS,
-      OAUTH2_GRANT_TYPE_AUTH_CODE,
     );
   }
 
@@ -168,15 +170,12 @@ class YiiOAuth2 extends OAuth2 {
   }
   
   protected function checkUserCredentials($client_id, $username, $password) {
-      $model=new LoginForm;
-      $arr = array(
-                'username'=>$username,
-                'password'=>$password,
-      );
 
-      $model->attributes=$arr;
-      if($model->validate() && UserIdentity::ERROR_NONE===$model->login())
+      $this->_identity=new UserIdentity($username, $password);
+      $this->_identity->authenticate($client_id, true);
+      if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
       {
+          Yii::app()->user->login($this->_identity, 0);
           $user_id = Yii::app()->user->id;
           $this->setVariable("user_id", $user_id);
           return TRUE;
