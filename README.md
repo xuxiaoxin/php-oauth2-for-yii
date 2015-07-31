@@ -4,7 +4,7 @@
 ## Usage
 
 ### Authorize
-{{{
+```
 
 $oauth = YiiOAuth2::instance();
 $auth_params = $oauth->getAuthorizeParams();
@@ -20,28 +20,28 @@ if($_POST){
    $oauth->setVariable("user_id", $user_id);
    $oauth->finishClientAuthorization(TRUE, $_POST);
 }
-}}}
+```
 
 
 ### Request Access token
-{{{
+```
 $oauth = YiiOAuth2::instance();
 echo $oauth->grantAccessToken();
-}}}
+```
 
 
 ### Protect Resource
-{{{
+```
 $oauth = YiiOAuth2::instance();
 $user_id = $oauth->verify();
-}}}
+```
 
 
 ## Usage in Yii
 
 ### add a module
 
-{{{
+```
 
 <?php
 class ApiModule extends CWebModule
@@ -132,11 +132,11 @@ class ApiModule extends CWebModule
         return self::$_uid;
     }
 }
-}}}
+```
 
 ### add the controller
 
-{{{
+```
 class OAuth2Controller extends Controller
 {
 	public function actionAccess_token()
@@ -167,5 +167,5 @@ class OAuth2Controller extends Controller
        }
 }
 
-}}}
+```
 
